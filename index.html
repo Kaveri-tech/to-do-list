@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous">
+    <title>To Do List</title>
+</head>
+
+<body style="background-color:#3480eb;">
+    <div style="height: 500px; width: 500px; background-color: white; margin-left: 450px;">
+        <div class="container mt-3">
+            <h4>Add list</h4>
+            <form id="addForm">
+                <div class="row">
+                    <div class="col-lg-7 col-md-7 col-sm-7">
+                        <input type="text" onkeyup="toggleButton(this, 'submit')" class="form-control" id="item">
+                    </div>
+                    <div class="col-lg-5 col-md-5 col-sm-5">
+                        <input type="submit" class="btn btn-dark" id="submit" value="Submit" disabled>
+                    </div>
+                </div>
+            </form>
+            <h5 class="mt-4">List</h5>
+            <form id="listForm">
+                <ul class="list-group" id="items"></ul>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        let editItem = null; // Declare editItem in global scope
+
+        window.onload = () => {
+            const form = document.querySelector("#addForm");
+            const itemsList = document.getElementById("items");
+            const submitButton = document.getElementById("submit");
+
+            form.addEventListener("submit", handleSubmit);
+            itemsList.addEventListener("click", handleItemClick);
+        };
+
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            const submitButton = document.getElementById("submit");
+            const editMode = submitButton.value !== "Submit";
+
+            if (editMode) {
+                editListItem();
+                submitButton.value = "Submit";
+                clearInputField();
+            } else {
+                addItemToList();
+            }
+        }
+
+        function handleItemClick(event) {
+            event.preventDefault();
+
+            if (event.target.classList.contains("delete")) {
+                deleteListItem(event.target.parentNode);
+            }
+
+            if (event.target.classList.contains("edit")) {
+                editItem = event.target.parentNode; // Store the clicked list item
+                editFormForItem();
+            }
+        }
+
+        function addItemToList() {
+            const newItemValue = document.getElementById("item").value.trim();
+
+            if (!newItemValue) return;
+
+            document.getElementById("item").value = "";
+
+            const listItem = createListItem(newItemValue);
+            document.getElementById("items").appendChild(listItem);
+        }
+
+        function createListItem(text) {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item";
+
+            const deleteButton = createButton("Delete", "btn-danger btn btn-sm float-right delete");
+            const editButton = createButton("Edit", "btn-success btn btn-sm float-right edit");
+
+            listItem.appendChild(document.createTextNode(text));
+            listItem.appendChild(deleteButton);
+            listItem.appendChild(editButton);
+
+            return listItem;
+        }
+
+        function createButton(text, className) {
+            const button = document.createElement("button");
+            button.className = className;
+            button.appendChild(document.createTextNode(text));
+            return button;
+        }
+
+        function deleteListItem(listItem) {
+            listItem.parentNode.removeChild(listItem);
+        }
+
+        function editFormForItem() {
+            document.getElementById("item").value = editItem.childNodes[0].textContent.trim();
+            document.getElementById("submit").value = "Update";
+        }
+
+        function editListItem() {
+            const editedText = document.getElementById("item").value.trim();
+            editItem.childNodes[0].textContent = editedText;
+        }
+
+        function clearInputField() {
+            document.getElementById("item").value = "";
+        }
+
+        function toggleButton(input, buttonId) {
+            document.getElementById(buttonId).disabled = !input.value.trim();
+        }
+    </script>
+</body>
+
+</html>
